@@ -1,60 +1,66 @@
 # oh-my-new-mac
 
-给 agent 阅读的 macOS 配置清单、官方安装依据和交互流程。适用于新 Mac，也适用于已有开发环境的 Mac。
-
-打开本仓库，在 agent 中输入：
+给 agent 阅读的 macOS 配置清单、官方安装依据和交互流程。适用于新 Mac，也适用于已有部分开发环境的 Mac。打开仓库后输入：
 
 ```text
 /setup-mac
 ```
 
-agent 会先盘点环境，通过问题确认需求，再按已确认范围补装和配置，最后验证并交接。**不会默认重装已有工具、替换版本管理器、重写 shell 配置或开启自动升级。**
+agent 先盘点并展示分类工具列表，再确认范围、完成安装配置和验证。可以一键全选并让 agent 自行处理冲突，也可以提供白名单/黑名单；**默认保留可用环境，冲突默认询问，用户选择自动处理后不再逐项问。**
 
-## 入口与兼容性
+## 按分类维护，每个工具一个文件
 
-核心 skill 是 [.agents/skills/setup-mac/SKILL.md](.agents/skills/setup-mac/SKILL.md)。本仓库不提供 `install-all.sh`、一键 Brewfile 或自动修改系统的总控程序；`utilities/` 只存放用户选择后可以安装的实用工具。
+| 分类 | 内容 |
+|---|---|
+| [基础环境](docs/base/README.md) | Homebrew、Apple CLT、Git、nvm/Node、pyenv/Python/uv、pipx |
+| [AI tools](docs/ai-tools/README.md) | Kimi Code、Codex、Grok、Claude Code、Pi、OpenCode、Cursor CLI、Gemini |
+| [实用脚本](docs/scripts/README.md) | 多目录异步删除、CLI 升级维护 |
+| [CLI 工具](docs/cli-tools/README.md) | yazi、glow、ripgrep、fd、fzf、zoxide、radio-active、spotatui、FFmpeg、mpv、yt-dlp、surge、PicGo Core |
+| [GUI 应用](docs/gui-apps/README.md) | Otty、Warp、Zed、Chrome、Codex Desktop、Cursor Desktop、Caffeine、Amphetamine |
 
-| Agent | 项目入口 | 使用方式 |
+共 40 个配置条目，详见 [docs 总目录](docs/README.md)。共享流程放在 `docs/guides/`；旧速查表与 AI 安装表已拆开，两份附件仅保留在 [历史归档](archive/reference-inputs/README.md)。这不是 `install-all.sh` / Brewfile 包装，`utilities/` 仅存放用户可选的实用脚本实现。
+
+基础环境补齐了 [Homebrew](docs/base/homebrew.md)、[nvm](docs/base/nvm.md)、[system/nvm Node 版本协调](docs/base/node.md) 与 [pyenv](docs/base/pyenv.md) + [uv](docs/base/uv.md)。不替换系统 Python，不为“统一”强行移除 Brew/项目依赖；未能完全统一的版本会明确报告。
+
+## 选择方式
+
+在 `/setup-mac` 后通过问答选择，也可直接附上自然语言要求：
+
+```text
+全部配置，冲突你自行解决，不用再问。
+只安装 Homebrew、nvm、Node、pyenv、Python、uv；允许必要依赖。
+基础环境和 AI tools 全选，排除 grok、gemini；冲突时问我。
+除 GUI 工具和 surge 以外都配置，冲突自动处理。
+只检查现有环境并给建议，不安装。
+```
+
+这是对话示例，不是仓库实现的命令行参数。全选会展开当前目录；白名单默认只处理列出的组件；黑名单优先，依赖不能绕过排除。自动模式会实际完成可安全解决的冲突，无法无损处理的项跳过并记录。详见 [选择与冲突规则](docs/guides/selection-and-conflicts.md)。
+
+全选不代表开启定时更新、登录启动、默认 App 切换、永久防休眠、云同步、付费请求或删除真实文件。系统审批和账号登录仍按宿主要求完成，无法自动处理时记录为待用户操作。
+
+## Agent 入口
+
+核心 skill：[.agents/skills/setup-mac/SKILL.md](.agents/skills/setup-mac/SKILL.md)。优先使用真实可用的 `AskUserQuestions` / `AskUserQuestion`；其他工具名与无交互工具的情形按 [兼容说明](docs/guides/agent-compatibility.md) 适配。
+
+| Agent | 项目入口 | 调用 |
 |---|---|---|
-| Claude Code | `.claude/skills/setup-mac` 指向核心 skill | `/setup-mac` |
+| Claude Code | `.claude/skills/setup-mac` 链接核心 skill | `/setup-mac` |
 | Gemini CLI | `.gemini/commands/setup-mac.toml` | `/setup-mac` |
-| Cursor | `.cursor/skills/setup-mac` 指向核心 skill | 使用 skill 选择器；若当前版本提供该 slash command，可输入 `/setup-mac` |
-| Codex | 原生发现 `.agents/skills/` | `$setup-mac` 或 `/skills` 选择；不能保证它把 `/setup-mac` 识别为自定义命令 |
-| 其他 agent / 不识别命令的版本 | `AGENTS.md` 和核心 skill | 使用下面的普通对话入口 |
+| Cursor | `.cursor/skills/setup-mac` 链接核心 skill | skill 选择器；版本支持时 `/setup-mac` |
+| Codex | 原生发现 `.agents/skills/` | `$setup-mac` 或 `/skills` 选择 |
+| 其他 / 不识别 slash 的版本 | `AGENTS.md` 与核心 skill | 普通对话入口 |
+
+仓库不能保证所有 agent 采用同一种 slash 语法。不识别时输入：
 
 ```text
 请阅读 AGENTS.md 和 .agents/skills/setup-mac/SKILL.md，执行 setup-mac。
-先检查已有环境，再和我确认需要配置的内容，不覆盖原有配置。
+先展示分类工具清单，我会选择全选、白名单或黑名单，并决定冲突是否询问。
 ```
 
-**“任意 agent”不能由一个仓库保证相同的工具名称或 slash command 语法。** skill 优先调用实际可用的 `AskUserQuestions`；可适配 `AskUserQuestion`、`request_user_input` 等宿主工具，没有交互工具时使用普通对话。不会虚构工具、绕过宿主权限，或因缺少某个名称而放弃盘点。详见 [agent 兼容说明](docs/agent-compatibility.md)。
+## 已有 Mac 与来源保障
 
-## 可以配置什么
+配置前盘点来源和版本，备份将修改的真实文件，合并必要差异并避免重复加载；再次运行可继续补缺，不重装已有环境。机器私有记录放在 `.local/`，不进入 Git。
 
-| 模块 | 内容 | 默认策略 |
-|---|---|---|
-| [基础开发环境](docs/development.md) | Apple 开发工具、Homebrew、Git、Node/nvm、Python/uv、pipx | 先识别现有版本和管理渠道，再补缺 |
-| [AI CLI](docs/ai-cli-upgrade.md) | Claude、Codex、Kimi、Grok、Cursor Agent、Gemini；traex 待来源确认 | 每个命令保留原渠道，不强行装齐 |
-| [终端工具](docs/terminal-cheatsheet.md) | yazi、glow、radio-active、spotatui、surge、ripgrep、PicGo | 按需要选择，媒体/发布/上传功能单独确认 |
-| [后台删除](docs/rm-async.md) | `rm_async` 多路径、每项 ID、`rm_progress` 状态/估算 | 可选；安装不代表允许删除用户文件 |
-| [升级维护](docs/ai-cli-upgrade.md#定时升级由-agent-按本机生成) | 按已安装渠道升级、可选 launchd 定时运行 | 默认手动；定时执行需要用户选择 |
+每个工具页独立记录原项目、官方安装/配置依据和核验日期。没有公开实现仓库的 App 如实标注官方分发来源，不用同名 GitHub 项目替代。Otty/Caffeine 的发行方、Codex Desktop 的当前分发限制等见各自条目；执行时重新核验，不凭旧页面猜安装命令。
 
-上游核验日期：**2026-08-31**。[来源索引](docs/sources.md)记录原项目和安装文档；执行配置时仍应检查当前官方说明。没有确认来源的项目只报告，不猜包名、不安装。
-
-## 已有 Mac 的处理原则
-
-- 可用的旧环境优先保留。发现 nvm、fnm、mise、pyenv、conda 等已有管理器时，不为了统一目录而再装一套。
-- 多版本、多渠道或 shell 初始化冲突，先给出差异和建议。只有用户选择迁移后才变更 PATH 或默认版本。
-- 改动前备份将修改的文件；修改自己的标记块，保留文件其余内容。再次运行不重复追加、不重复建定时任务。
-- 检测到公司管理策略、代理、证书、权限限制时，遵循现有策略；不关闭安全功能。
-- 凭据由用户在官方登录流程或本机配置中输入；不写进仓库、报告或 shell 历史。
-
-## 文档与记录
-
-- [盘点、变更与回滚](docs/workflow.md)
-- [配置需求问答](.agents/skills/setup-mac/references/questions.md)
-- [本机报告模板](templates/setup-report.md)：实际报告写入被 Git 忽略的 `.local/`，不提交机器信息。
-- [附件原文](docs/imported/README.md)：两份历史附件原样保留。原文不是当前安装指令，采用核验后的指南。
-- [验证说明](docs/validation.md)：区分脚本验证、安装成功、认证成功与实际功能可用。
-
-维护本仓库时请更新来源和验证记录。不要把个人用户名、机器路径、令牌、旧任务 ID 或固定的 Node 版本目录作为新机器的默认值。
+更多说明：[盘点与回滚](docs/guides/workflow.md) · [来源方法](docs/guides/sources.md) · [验证与行为场景](docs/guides/validation.md) · [报告模板](templates/setup-report.md)。

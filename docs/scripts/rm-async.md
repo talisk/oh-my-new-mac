@@ -1,6 +1,8 @@
 # 后台永久删除：rm_async / rm_progress
 
-实现位于 [functions.zsh](../utilities/rm-async/functions.zsh) 和 [worker.zsh](../utilities/rm-async/worker.zsh)。仅支持 macOS zsh，使用系统内置工具，无须 pip/npm/Homebrew 依赖。
+工具 ID：`rm-async`；包含 `rm_async` 与 `rm_progress`。
+
+实现位于 [functions.zsh](../../utilities/rm-async/functions.zsh) 和 [worker.zsh](../../utilities/rm-async/worker.zsh)。仅支持 macOS zsh，使用系统内置工具，无须 pip/npm/Homebrew 依赖。
 
 **不经过废纸篓，删除不可恢复。** 配置流程只安装命令，不删除真实文件；测试只用临时目录。
 
@@ -34,7 +36,7 @@ rm_progress job.XXXXXXXX
 
 1. 检查用户是否使用 zsh、真实 `ZDOTDIR`、现有同名函数及 `~/.config/rm-async/`。若已有本功能，比较版本并检查活跃任务；不要截断正在执行的 worker，也不要丢弃旧任务状态。
 2. 用户选择后备份将修改的文件，将两个实现文件复制到 `~/.config/rm-async/`。使用同目录临时文件和原子替换，不把整个仓库的配置灌进主目录。两个文件需一起部署；worker 路径从函数定义文件旁解析。
-3. 只在实际的 zsh 配置入口合并一次 [工作流中的加载块](workflow.md#最小修改)。已有同等 source 时不重复追加；旧 `rm-async` 标记先识别后合并。
+3. 只在实际的 zsh 配置入口合并一次 [工作流中的加载块](../guides/workflow.md#最小修改)。已有同等 source 时不重复追加；旧 `rm-async` 标记先识别后合并。
 4. 当前用户终端执行 `source ~/.config/rm-async/functions.zsh`，或打开新终端。agent 子进程里的 source 不会改变用户已打开的 shell。
 5. 用临时目录验证单目标、多目标、空格、符号链接、返回 ID、查询和终端退出后继续运行。没有 PTY 就明确未覆盖真实作业控制。
 

@@ -1,6 +1,7 @@
-description = "盘点 macOS 环境，确认配置需求，保留已有配置并补装所选工具"
+description = "按分类配置 Mac：全选、白名单/黑名单，可选择自动处理冲突"
 prompt = """
-请从项目根目录阅读 AGENTS.md 和 .agents/skills/setup-mac/SKILL.md，执行 setup-mac 工作流。
-先只读盘点，通过可用的 AskUserQuestions 或等价交互能力确认需求；不可用时用普通对话。
-不要在用户确认具体计划前安装、升级、迁移或覆盖配置。按核心 skill 的引用读取所选模块。
+请从项目根目录读取 AGENTS.md 和 .agents/skills/setup-mac/SKILL.md，执行 setup-mac。
+先盘点并展示各分类的具体工具，使用可用的 AskUserQuestions 或等价工具收集尚未明确的选择。
+用户已给出的全选、名单、冲突策略直接复用；一键全选自动处理时展示方案后连续执行，不重复确认普通冲突。
+没有需求工具时按核心 skill 回退，不绕过宿主审批。只按所选范围读取工具文档并配置。
 """
