@@ -1,0 +1,6 @@
+description = "盘点 macOS 环境，确认配置需求，保留已有配置并补装所选工具"
+prompt = """
+请从项目根目录阅读 AGENTS.md 和 .agents/skills/setup-mac/SKILL.md，执行 setup-mac 工作流。
+先只读盘点，通过可用的 AskUserQuestions 或等价交互能力确认需求；不可用时用普通对话。
+不要在用户确认具体计划前安装、升级、迁移或覆盖配置。按核心 skill 的引用读取所选模块。
+"""

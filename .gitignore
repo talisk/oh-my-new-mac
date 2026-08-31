@@ -1,0 +1,10 @@
+.DS_Store
+.local/
+work/
+__pycache__/
+*.pyc
+*.log
+*.backup-*
+.env
+.env.*
+!.env.example
