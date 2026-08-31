@@ -1,18 +1,24 @@
 # Agent 入口与提问工具兼容
 
-核验日期：2026-08-31。仓库只能提供符合宿主协议的文件，不能让不支持自定义命令的 agent 凭空接受 `/setup-mac`。用户的目标流程保持一致，入口语法和工具名称允许适配。
+核验日期：2026-08-31。仓库只能提供符合宿主协议的文件，不能让不支持自定义命令的 agent 凭空接受 `/setup-mac` 或 `/add-config`。两个流程分别是安装配置与收录配置，入口语法和工具名称允许适配。
 
-## 单一 skill，多种发现方式
+## 每个 skill 一份内容，多种发现方式
 
 | 宿主 | 本仓库文件 | 依据与限制 |
 |---|---|---|
-| Codex | `.agents/skills/setup-mac/SKILL.md` | [官方 skills 文档](https://learn.chatgpt.com/docs/build-skills)说明项目发现与 `$`、`/skills` 调用；不能推导出任意 `/名称` 自动可用 |
-| Claude Code | `.claude/skills/setup-mac` 相对符号链接；`CLAUDE.md` 指向 AGENTS | [官方 skills 文档](https://code.claude.com/docs/en/skills)支持项目 skill、同名 slash 调用和链接目录；用户/企业同名 skill 可能覆盖项目项 |
-| Gemini CLI | `.gemini/commands/setup-mac.toml`；`GEMINI.md` | [原项目 custom commands](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/custom-commands.md)支持项目 TOML，提示模型读取核心 skill，不注入任何安装 shell 命令 |
-| Cursor | `.cursor/skills/setup-mac` 相对符号链接 | [官方 skills 文档](https://cursor.com/help/customization/skills)提供项目目录；实际版本是否跟随链接、是否显示 `/setup-mac` 需要现场验证，失败用普通对话入口 |
+| Codex | `.agents/skills/setup-mac/`、`.agents/skills/add-config/` | [官方 skills 文档](https://learn.chatgpt.com/docs/build-skills)说明项目发现与 `$`、`/skills` 调用；如 `$add-config homebrew`，不能推导出任意 `/名称` 自动可用 |
+| Claude Code | `.claude/skills/` 下的两个相对符号链接；`CLAUDE.md` 指向 AGENTS | [官方 skills 文档](https://code.claude.com/docs/en/skills)支持项目 skill、同名 slash 调用和链接目录；如 `/add-config homebrew`，用户/企业同名 skill 可能覆盖项目项 |
+| Gemini CLI | `.gemini/commands/setup-mac.toml`、`add-config.toml`；`GEMINI.md` | [原项目 custom commands](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/custom-commands.md)支持项目 TOML；add-config 用 `{{args}}` 保留产品参数，不注入安装 shell 命令 |
+| Cursor | `.cursor/skills/` 下的两个相对符号链接 | [官方 skills 文档](https://cursor.com/help/customization/skills)提供项目目录；实际版本是否跟随链接、是否显示同名 slash 命令需要现场验证，失败用普通对话入口 |
 | Grok/Kimi/Trae/其他 | 根 AGENTS + 普通对话入口 | 没有逐个宿主启动验证，不宣称 slash 路由通用；按实际 discovery/help 配置，不擅自改全局 agent 设置 |
 
 项目必须经过宿主的工作区信任/权限步骤才能运行本机 shell。不要使用 bypass/YOLO 参数让 setup-mac“自动成功”。若宿主缓存技能列表，按官方方式刷新或重开会话；不要复制多份不一致的 SKILL.md。
+
+## 参数与模板副本
+
+`add-config homebrew` 的产品名应完整到达核心 skill。Gemini 的 `{{args}}` 放在普通提示文本中，不放进 `!{...}` shell 注入；其他宿主按其原生参数传递行为处理。参数缺失且用户上下文未提供产品时才补问；不能把参数直接拼成文件路径或 shell 命令。
+
+Use this template 创建副本后，相对链接仍应指向副本内的 `.agents/skills/`。若下载方式或宿主未保留/识别符号链接，直接让 agent 读取当前仓库的核心文件；不要因链接不可用而去读取原作者机器路径。目录中新增工具由 setup-mac 动态发现，不需要复制或修改所有宿主命令文件。
 
 ## AskUserQuestions 适配
 
@@ -21,7 +27,7 @@
 1. 存在 `AskUserQuestions`：用它分轮询问。
 2. 只有 `AskUserQuestion` 或其他同等工具：用其实际参数与多选能力，不照搬其他工具 schema。
 3. `request_user_input` 仅在当前模式允许时使用；不能把需求选择工具当作宿主审批工具。
-4. 都没有或当前不可调用：普通对话提问并等待，继续可做的只读工作。
+4. 都没有或当前不可调用：确需用户选择时用普通对话；已明确的收录请求或已授权配置可继续，不为缺少工具名称而暂停。
 
 不得为了工具名称匹配安装不明 MCP、虚构调用结果或默认代答。用户已选 auto 时，依据 [冲突规则](selection-and-conflicts.md) 自行决定常规配置修复，不需要宿主专有的“自动模式”开关。
 

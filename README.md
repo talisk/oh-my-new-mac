@@ -1,6 +1,16 @@
 # oh-my-new-mac
 
-给 agent 阅读的 macOS 配置清单、官方安装依据和交互流程。适用于新 Mac，也适用于已有部分开发环境的 Mac。打开仓库后输入：
+给 agent 阅读的 macOS 配置清单、官方安装依据和交互流程，也是一份可通过 GitHub **Use this template** 创建个人“Mac 配置器仓库”的模板。适用于新 Mac，也适用于已有部分开发环境的 Mac。
+
+从 [模板仓库](https://github.com/talisk/oh-my-new-mac) 选择 **Use this template → Create a new repository**，将自己的仓库 clone 到 Mac 后用 agent 打开。只有能访问模板的人才能使用它；Template 不会改变仓库的可见性。详见 [模板使用说明](docs/guides/template.md)。
+
+两个入口分别负责收录和配置：
+
+```text
+/add-config homebrew
+```
+
+检索 Homebrew 的官方来源、安装/配置和基本用法，更新当前仓库的既有条目；新工具按分类创建独立文件并加入清单。**只收录，不安装**。接着可输入：
 
 ```text
 /setup-mac
@@ -18,7 +28,7 @@ agent 先盘点并展示分类工具列表，再确认范围、完成安装配�
 | [CLI 工具](docs/cli-tools/README.md) | yazi、glow、ripgrep、fd、fzf、zoxide、radio-active、spotatui、FFmpeg、mpv、yt-dlp、surge、PicGo Core |
 | [GUI 应用](docs/gui-apps/README.md) | Otty、Warp、Zed、Chrome、Codex Desktop、Cursor Desktop、Caffeine、Amphetamine |
 
-共 40 个配置条目，详见 [docs 总目录](docs/README.md)。共享流程放在 `docs/guides/`；旧速查表与 AI 安装表已拆开，两份附件仅保留在 [历史归档](archive/reference-inputs/README.md)。这不是 `install-all.sh` / Brewfile 包装，`utilities/` 仅存放用户可选的实用脚本实现。
+完整条目以当前仓库的 [docs 总目录](docs/README.md) 和分类 README 为准，用户可持续扩充。共享流程放在 `docs/guides/`。这不是 `install-all.sh` / Brewfile 包装，`utilities/` 仅存放用户可选的实用脚本实现。
 
 基础环境补齐了 [Homebrew](docs/base/homebrew.md)、[nvm](docs/base/nvm.md)、[system/nvm Node 版本协调](docs/base/node.md) 与 [pyenv](docs/base/pyenv.md) + [uv](docs/base/uv.md)。不替换系统 Python，不为“统一”强行移除 Brew/项目依赖；未能完全统一的版本会明确报告。
 
@@ -38,16 +48,24 @@ agent 先盘点并展示分类工具列表，再确认范围、完成安装配�
 
 全选不代表开启定时更新、登录启动、默认 App 切换、永久防休眠、云同步、付费请求或删除真实文件。系统审批和账号登录仍按宿主要求完成，无法自动处理时记录为待用户操作。
 
+## 收录自己的配置
+
+`/add-config <产品名或官方 URL>` 会先检索当前目录，已存在则更新原文件，尚未收录则创建 `docs/<分类>/<工具-id>.md` 并更新分类索引。例如 `homebrew` 和 `brew` 指向同一条目，Cursor CLI 与 Cursor Desktop 则分别处理。
+
+每个条目收集来源、平台与依赖、安装、初始化、配置位置、基本使用、旧环境兼容、验证、更新和回滚。未核验的部分明确标注，不猜包名或配置键；实际安装时仍会重新核验。详见 [收录指南](docs/guides/adding-config.md)。
+
+新条目自动进入下一次 setup-mac 的清单，无需修改该 skill 的硬编码列表；已经开始的一次配置不会悄悄扩展到新加入的工具。副本的修改留在自己的仓库，不自动推送模板上游。
+
 ## Agent 入口
 
-核心 skill：[.agents/skills/setup-mac/SKILL.md](.agents/skills/setup-mac/SKILL.md)。优先使用真实可用的 `AskUserQuestions` / `AskUserQuestion`；其他工具名与无交互工具的情形按 [兼容说明](docs/guides/agent-compatibility.md) 适配。
+核心 skill：[setup-mac](.agents/skills/setup-mac/SKILL.md) 和 [add-config](.agents/skills/add-config/SKILL.md)。需要问答时优先使用真实可用的 `AskUserQuestions` / `AskUserQuestion`；其他工具名与无交互工具的情形按 [兼容说明](docs/guides/agent-compatibility.md) 适配。
 
 | Agent | 项目入口 | 调用 |
 |---|---|---|
-| Claude Code | `.claude/skills/setup-mac` 链接核心 skill | `/setup-mac` |
-| Gemini CLI | `.gemini/commands/setup-mac.toml` | `/setup-mac` |
-| Cursor | `.cursor/skills/setup-mac` 链接核心 skill | skill 选择器；版本支持时 `/setup-mac` |
-| Codex | 原生发现 `.agents/skills/` | `$setup-mac` 或 `/skills` 选择 |
+| Claude Code | `.claude/skills/` 分别链接两个核心 skill | `/setup-mac`、`/add-config homebrew` |
+| Gemini CLI | `.gemini/commands/` 的两个 TOML 入口 | `/setup-mac`、`/add-config homebrew` |
+| Cursor | `.cursor/skills/` 分别链接两个核心 skill | skill 选择器；版本支持时使用同名 slash 命令 |
+| Codex | 原生发现 `.agents/skills/` | `$setup-mac`、`$add-config homebrew` 或 `/skills` 选择 |
 | 其他 / 不识别 slash 的版本 | `AGENTS.md` 与核心 skill | 普通对话入口 |
 
 仓库不能保证所有 agent 采用同一种 slash 语法。不识别时输入：
@@ -55,6 +73,12 @@ agent 先盘点并展示分类工具列表，再确认范围、完成安装配�
 ```text
 请阅读 AGENTS.md 和 .agents/skills/setup-mac/SKILL.md，执行 setup-mac。
 先展示分类工具清单，我会选择全选、白名单或黑名单，并决定冲突是否询问。
+```
+
+收录入口的普通对话等价形式：
+
+```text
+请阅读 AGENTS.md 和 .agents/skills/add-config/SKILL.md，为当前仓库收录 homebrew 的配置方法，不执行安装。
 ```
 
 ## 已有 Mac 与来源保障

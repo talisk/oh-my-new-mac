@@ -1,12 +1,14 @@
 # 给配置 agent 的工作约定
 
-本仓库是 `oh-my-new-mac`：给 agent 的 macOS 配置清单与方法汇总，适配新机和已有环境，不是全量安装脚本。
+本仓库基于 `oh-my-new-mac` 模板：给 agent 的 macOS 配置清单与方法汇总，适配新机和已有环境，不是全量安装脚本。通过 Use this template 创建的副本由其用户独立维护。
 
 ## 路由
 
-用户输入 `/setup-mac`、`$setup-mac`，或要求配置这台 Mac 时，读取 `.agents/skills/setup-mac/SKILL.md`。仅编辑仓库、审查文档或测试时，不启动当前机器配置。
+用户输入 `/setup-mac`、`$setup-mac`，或要求配置这台 Mac 时，读取 `.agents/skills/setup-mac/SKILL.md`。用户输入 `/add-config <产品>`、`$add-config <产品>`，或要求向仓库收录/更新配置方法时，读取 `.agents/skills/add-config/SKILL.md`。仅收录信息、编辑仓库、审查文档或测试时，不启动当前机器配置。
 
-从仓库根目录解析流程中的路径。核心 skill 只有 `.agents/skills/setup-mac/` 一份；其他宿主入口引用它。`docs/README.md` 是分类入口，各分类 README 是工具列表唯一来源，每个工具/App 单独一个文件。
+从当前工作区的仓库根目录解析路径。两个 skill 各自以 `.agents/skills/<名称>/` 为唯一内容来源，其他宿主入口引用它们。`docs/README.md` 是分类入口，各分类 README 是工具列表唯一来源，每个工具/App 单独一个文件。工具数量随用户收录变化，不能固定为模板最初的清单。
+
+模板的上游链接仅用于出处和文档参考，不决定当前写入/推送目标。不要因为目录名、README 标题或上游链接而切换到另一个 checkout、修改 origin、全局 Git 身份或替用户向模板上游推送。
 
 ## 选择和执行
 
@@ -24,6 +26,6 @@
 ## 仓库维护
 
 - 中文文档，命令沿用已核验的上游写法。新增工具时更新对应分类索引、单工具页与必要依赖链接；不要往顶层堆大杂烩文档。
-- `archive/reference-inputs/` 保留原始附件，不作为自动执行清单；核验后的内容分别维护在工具页。
+- 收录规范见 `docs/guides/adding-config.md`；原始历史附件不再随模板分发。不复制整份上游手册，不把未核验方法当可执行指令。
 - `utilities/rm-async/` 仅为实用工具实现，不改造成装机入口。修改其逻辑必须执行 `python3 -m unittest discover -s tests -v`；真实 PTY 用例不能用管道测试替代，只删除测试自建临时目标。
 - 交付前检查相对链接、名单/冲突规则一致性、skill frontmatter、宿主入口、敏感信息和 `git diff --check`。未经用户要求不创建远程仓库、push 或发布。

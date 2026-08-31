@@ -2,15 +2,15 @@
 
 每类一个目录，每个工具/App 一个文件。分类 README 是 **问答工具清单的唯一来源**；skill 每次读取它们展示选项，不另外维护一份容易过期的工具列表。
 
-| 分类 | 内容 | 条目数 |
-|---|---|---|
-| [基础环境](base/README.md) | Apple 开发工具、Homebrew、Git、nvm/Node、pyenv/Python/uv、pipx | 9 |
-| [AI tools](ai-tools/README.md) | Kimi、Codex、Grok、Claude Code、Pi、OpenCode、Cursor CLI、Gemini | 8 |
-| [实用脚本](scripts/README.md) | 后台删除、CLI 升级维护 | 2 |
-| [CLI 工具](cli-tools/README.md) | 文件/Markdown/搜索/媒体/部署/图床工具 | 13 |
-| [GUI 应用](gui-apps/README.md) | Otty、Warp、Zed、Chrome、Codex Desktop、Cursor Desktop、Caffeine、Amphetamine | 8 |
+| 分类 | 内容 |
+|---|---|
+| [基础环境](base/README.md) | 开发工具、包管理器、语言环境及其管理器 |
+| [AI tools](ai-tools/README.md) | AI CLI / agent 工具 |
+| [实用脚本](scripts/README.md) | 独立实用脚本与维护工具 |
+| [CLI 工具](cli-tools/README.md) | 文件/Markdown/搜索/媒体/部署/图床等终端工具 |
+| [GUI 应用](gui-apps/README.md) | 终端、编辑器、浏览器、AI 桌面及其他 macOS App |
 
-总计 40 个配置条目。全选指以上条目，不包含归档附件中出现的额外软件、网页推荐的可选插件，或未来新增条目；执行计划应保存本次展开的快照。必要依赖按所选策略列出，不能绕过黑名单。
+全选按当前分类 README 展开，不固定工具数量。通过 `/add-config` 添加的条目会在下次需求确认时列出；一轮配置开始后保存清单快照，不自动扩展到后来新增条目或网页推荐的插件。标“待核验”的条目在核验完成前不能执行安装。必要依赖按所选策略列出，不能绕过黑名单。
 
 ## 如何选择
 
@@ -28,5 +28,7 @@
 - [Agent 入口 / AskUserQuestions 适配](guides/agent-compatibility.md)
 - [来源核验方法](guides/sources.md)
 - [验证与行为验收](guides/validation.md)
+- [收录配置：add-config](guides/adding-config.md)
+- [通过 GitHub Template 创建个人仓库](guides/template.md)
 
-旧 `terminal-cheatsheet.md` 已按工具拆分，旧 `ai-cli-upgrade.md` 已拆到 AI tools 和实用脚本。两份原始附件仅作 [历史归档](../archive/reference-inputs/README.md)，不再作为安装入口。
+配置方法维护在单工具文档中，分类 README 只负责发现与选择。新增或更新条目不需要复制全套速查表，也不需要修改 setup-mac 的工具列表。

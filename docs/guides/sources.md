@@ -27,7 +27,7 @@
 
 Chrome、Otty、Amphetamine、部分桌面产品没有确认可用于安装本体的公开 GitHub 实现仓库时，如实标注官方分发入口；不声称“所有工具源码都已找到”。Apple CLT 使用 [Apple 官方文档](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools/)。
 
-附件中的 traex 没有定位到可靠公开原项目，保留在 [归档](../../archive/reference-inputs/README.md)，不进入可安装目录。若用户未来明确选择它，先取得可验证的官方分发依据。
+未定位到可靠官方项目的工具，不猜测安装方法。通过 [add-config](adding-config.md) 收录时可以记录已确认身份及来源缺口，但要标为“待核验”，在补齐证据前不得执行安装。
 
 ## 仓库自身的脚本和协议
 
